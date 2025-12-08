@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>FinanceFlow2 — Login</title>
+  <!-- styles — load the global public stylesheet so the static root page displays correctly -->
+  <!-- with Vite the `public` folder is served at root, so use /styles.css -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="container">
+    <section class="card login-card">
+      <div class="avatar">
+        <!-- simple cloud SVG -->
+        <svg viewBox="0 0 120 80" width="120" height="80" xmlns="http://www.w3.org/2000/svg">
+          <g>
+            <ellipse cx="60" cy="50" rx="45" ry="20" fill="#ffffff"/>
+            <ellipse cx="40" cy="40" rx="22" ry="16" fill="#ffffff"/>
+            <ellipse cx="80" cy="40" rx="20" ry="14" fill="#ffffff"/>
+            <rect x="0" y="0" width="120" height="80" rx="12" fill="none"/>
+            <circle cx="48" cy="44" r="2" fill="#333"/>
+            <circle cx="72" cy="44" r="2" fill="#333"/>
+            <path d="M50 56 Q60 66 70 56" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </g>
+        </svg>
+      </div>
+      <h1 class="brand">Koin Cloud</h1>
+
+      <label class="field">
+        <span>Email</span>
+        <input id="email" type="email" placeholder="Enter your email">
+      </label>
+
+      <label class="field">
+        <span>Password</span>
+        <input id="password" type="password" placeholder="Enter your password">
+      </label>
+
+  <button id="loginBtn" class="btn primary">Login</button>
+  <a id="registerLink" class="link" href="register.html">Don't have an account? Register / Skip</a>
+    </section>
+  </main>
+
+  <!-- React app is only mounted on the React entry (Frontend/public/index.html).
+       Avoid loading main.jsx on this static login page to prevent mounting errors. -->
+  <script>
+    // Build API path depending on environment (Vite dev vs WAMP subpath)
+    function apiPath(endpoint){
+      const port = window.location.port;
+      if(port === '5173') return '/Backend/' + endpoint;
+      // If site is served under /FinanceFlow or /finance_flow on Apache
+      const p = window.location.pathname.toLowerCase();
+      if(p.startsWith('/financeflow') || p.startsWith('/finance_flow')) return window.location.pathname.split('/').slice(0,2).join('/') + '/Backend/' + endpoint;
+      return 'Backend/' + endpoint;
+    }
+
+    document.getElementById('loginBtn').addEventListener('click', async function(){
+      const email = (document.getElementById('email').value || '').trim().toLowerCase();
+      const password = document.getElementById('password').value || '';
+      if(!email || !password){ alert('Veuillez renseigner email et mot de passe'); return; }
+      try{
+        const res = await fetch(apiPath('login.php'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const text = await res.text();
+        try{ const data = JSON.parse(text); if(data.ok){ window.location.href = 'dashboard.html'; } else { alert(data.message || 'Échec de la connexion'); } }
+        catch(e){ console.error('Invalid JSON response for login:', text); alert('Réponse serveur invalide — voir console'); }
+      }catch(e){ console.error(e); alert('Erreur réseau'); }
+    });
+  </script>
+</body>
+</html>

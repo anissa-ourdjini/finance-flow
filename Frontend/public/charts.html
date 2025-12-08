@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>FinanceFlow — Graphiques</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <main class="container">
+    <section class="card dash-card">
+      <div class="dash-header">
+  <a href="dashboard.html" class="back">←</a>
+        <h2>Mon budget — Graphiques</h2>
+  <a href="/" class="more">Accueil</a>
+      </div>
+
+      <div class="chart-box">
+        <canvas id="donutChart" width="240" height="240"></canvas>
+        <div class="donut-center">
+          <div class="total-label">Total dépensé</div>
+          <div id="totalSpent" class="total-amount">0 €</div>
+        </div>
+      </div>
+
+      <div class="legend">
+        <div><span class="dot snacks"></span>Snacks</div>
+        <div><span class="dot games"></span>Jeux</div>
+        <div><span class="dot plushies"></span>Peluches</div>
+        <div><span class="dot boba"></span>Boba</div>
+      </div>
+
+      <nav class="bottom-nav">
+  <a class="nav-item" href="dashboard.html">Tableau</a>
+  <a class="nav-item active" href="charts.html">Graphiques</a>
+  <a class="nav-item" href="dashboard.html">Ajouter</a>
+        <a class="nav-item" href="#">Paramètres</a>
+      </nav>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+  <script src="./charts.js"></script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Settings — FinanceFlow</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="container">
+    <section class="card">
+      <h2>Paramètres</h2>
+      <div style="margin-top:8px;">
+        <button id="backToBudgets" class="btn">← Retour aux budgets</button>
+      </div>
+      <p>Gérez les options de l'application.</p>
+
+      <div style="display:flex;gap:12px;flex-direction:column;max-width:520px;">
+        <div>
+          <h3>Compte</h3>
+          <p id="accountInfo">Chargement des informations utilisateur...</p>
+          <button id="logoutBtn" class="btn">Se déconnecter</button>
+        </div>
+
+        <div>
+          <h3>Apparence</h3>
+          <label style="display:flex;gap:8px;align-items:center;"><input id="themeToggle" type="checkbox"> Mode sombre</label>
+        </div>
+
+        <div>
+          <h3>Données</h3>
+          <button id="exportBtn" class="btn">Exporter les données locales (JSON)</button>
+          <a href="users.html" class="btn">Gérer les utilisateurs</a>
+          <a href="categories.html" class="btn">Gérer les catégories</a>
+          <a href="transactions.html" class="btn">Voir les transactions</a>
+          <a href="budgets.html" class="btn">Gérer les budgets</a>
+        </div>
+
+        <div>
+          <h3>Base de données</h3>
+          <p style="margin:0">Pour initialiser la base MySQL sous WAMP, utilisez <strong>phpMyAdmin</strong> ou exécutez le script <code>Backend/init_db.php</code> depuis le serveur (voir la documentation du backend).</p>
+        </div>
+      </div>
+
+      <pre id="result" style="margin-top:12px;background:#f6f8f7;padding:8px;border-radius:6px;display:none;white-space:pre-wrap;"></pre>
+    </section>
+  </main>
+
+  <script>
+    // Simple settings behaviour (no direct database management)
+    const resEl = document.getElementById('result');
+
+    // Account info (attempt to fetch current user via backend, fallback to guest)
+    async function loadAccount(){
+      const infoEl = document.getElementById('accountInfo');
+      try{
+        const res = await fetch('/Backend/login.php', { method: 'OPTIONS' });
+        // We don't actually call login; instead show a placeholder.
+      }catch(e){}
+      // Placeholder behavior: show session if any saved in sessionStorage
+      const user = sessionStorage.getItem('ff_user') ? JSON.parse(sessionStorage.getItem('ff_user')) : null;
+      if(user) infoEl.textContent = `${user.prenom || ''} ${user.nom || ''} — ${user.email || ''}`;
+      else infoEl.textContent = 'Aucun utilisateur connecté (visiteur)';
+    }
+
+    function computeBaseApp(){
+      const _origin = window.location.origin;
+      const _path = window.location.pathname.toLowerCase();
+      return _origin + ( _path.includes('/financeflow') ? _path.split('/').slice(0,2).join('/') + '/' : '/FinanceFlow/' );
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', function(){
+      sessionStorage.removeItem('ff_user');
+      const BASE_APP = computeBaseApp();
+      window.location.href = BASE_APP + 'index.html';
+    });
+
+    // Back to budgets button
+    const backBtn = document.getElementById('backToBudgets');
+    if(backBtn){
+      backBtn.addEventListener('click', function(){
+        const BASE_APP = computeBaseApp();
+        window.location.href = BASE_APP + 'budgets.html';
+      });
+    }
+
+    // Theme toggle (store in localStorage)
+    const themeToggle = document.getElementById('themeToggle');
+    function applyTheme(dark){
+      if(dark) document.documentElement.setAttribute('data-theme', 'dark');
+      else document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('ff_dark', dark ? '1' : '0');
+    }
+    themeToggle.addEventListener('change', (e)=> applyTheme(e.target.checked));
+    // initialize
+    themeToggle.checked = localStorage.getItem('ff_dark') === '1';
+    applyTheme(themeToggle.checked);
+
+    // Export local data (dummy: exports localStorage + sessionStorage)
+    document.getElementById('exportBtn').addEventListener('click', function(){
+      const data = { local: {}, session: {} };
+      for(const k of Object.keys(localStorage)) data.local[k] = localStorage.getItem(k);
+      for(const k of Object.keys(sessionStorage)) data.session[k] = sessionStorage.getItem(k);
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'financeflow-data.json';
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    loadAccount();
+  </script>
+</body>
+</html>

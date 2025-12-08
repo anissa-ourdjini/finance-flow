@@ -1,0 +1,68 @@
+html, body {
+  font-size: 22px;
+}
+
+#root {
+  /* Occupy the full viewport so the app is truly full-screen */
+  width: 100vw;
+  min-width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 3rem;
+}
+
+.top-nav{
+  display:flex;
+  gap:1.5rem;
+  padding:1.5rem 2rem;
+  background: linear-gradient(90deg,#0f172a,#0b4a6f);
+}
+.top-nav a{ color: #fff; text-decoration:none; font-weight:800; font-size:1.2rem }
+
+main{ padding:2.5rem; max-width:1400px; margin:0 auto }
+
+.dashboard .dash-header{ display:flex; flex-direction:column; gap:1rem }
+.summary{ display:flex; gap:1rem }
+.summary .card{ background:#fff; padding:2rem; border-radius:12px; box-shadow:0 10px 24px rgba(2,6,23,0.12) }
+.card .big{ font-size:2.6rem; font-weight:900 }
+
+.tx-table{ width:100%; border-collapse:collapse; margin-top:1rem }
+.tx-table th,.tx-table td{ border-bottom:1px solid #eee; padding:1rem 1.25rem; text-align:left; font-size:1.05rem }
+
+.tx-form, .budget-form{ display:flex; gap:1rem; margin-bottom:1.5rem }
+.tx-form input, .budget-form input{ padding:1rem 1.1rem; border-radius:10px; border:1px solid #ddd; font-size:1.05rem }
+
+@media(max-width:700px){ .summary{ flex-direction:column } .top-nav{ flex-wrap:wrap } }

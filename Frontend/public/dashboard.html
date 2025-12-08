@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>FinanceFlow — Tableau de bord</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="container">
+    <section class="card dash-card">
+    <div class="dash-header">
+  <a href="/" class="back">←</a>
+        <h2>Mon budget</h2>
+  <a href="charts.html" class="more">Graphiques</a>
+      </div>
+
+      <div class="summary">
+        <div class="donut-summary">
+          <div class="total-label">Total dépensé</div>
+          <div id="totalSpent" class="total-amount">0 €</div>
+        </div>
+      </div>
+
+      <h3>Récapitulatif du mois</h3>
+      <div class="meter">
+        <div class="meter-row">
+          <div class="label">Revenu</div>
+          <div class="value"><span id="incomeVal">1200</span> €</div>
+        </div>
+        <div class="progress" id="incomeProgress"><div class="progress-fill" style="width:100%"></div></div>
+
+        <div class="meter-row">
+          <div class="label">Dépensé</div>
+          <div class="value"><span id="funVal">0</span> €</div>
+        </div>
+        <div class="progress" id="funProgress"><div class="progress-fill" style="width:0%"></div></div>
+      </div>
+
+      <h3>Répartition par catégorie</h3>
+      <ul id="categoryList" class="category-list"></ul>
+
+      <div class="bottom-actions">
+        <button id="addTxBtn" class="btn">+ Ajouter</button>
+      </div>
+
+      <nav class="bottom-nav">
+        <a class="nav-item" href="/">Accueil</a>
+        <a class="nav-item active" href="charts.html">Graphiques</a>
+        <a class="nav-item" id="navAdd" href="#">Ajouter</a>
+        <a class="nav-item" id="navSettings" href="settings.html">Paramètres</a>
+      </nav>
+    </section>
+  </main>
+
+  <!-- Add Transaction Modal -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <h4>Ajouter une transaction</h4>
+      <label class="field"><span>Titre</span><input id="txTitle" placeholder="ex. Bubble tea"></label>
+      <label class="field"><span>Montant</span><input id="txAmount" type="number" placeholder="10.50"></label>
+      <label class="field"><span>Catégorie</span>
+        <select id="txCategory">
+          <option value="Snacks">Snacks</option>
+          <option value="Jeux">Jeux</option>
+          <option value="Peluches">Peluches</option>
+          <option value="Boba">Boba</option>
+        </select>
+      </label>
+      <div class="modal-actions">
+        <button id="saveTx" class="btn primary">Enregistrer</button>
+        <button id="cancelTx" class="btn">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+  <script src="./dashboard.js"></script>
+</body>
+</html>

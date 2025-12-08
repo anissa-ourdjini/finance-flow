@@ -1,0 +1,11 @@
+node_modules/
+dist/
+/.vite
+/Frontend/node_modules
+/Frontend/dist
+/Backend/logs/
+*.log
+.env
+/.env.local
+/.DS_Store
+vendor/
