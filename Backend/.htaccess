@@ -1,0 +1,19 @@
+# Backend API .htaccess
+# Redirect all requests to router.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /Backend/
+    
+    # Redirect all PHP files to router
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ router.php [QSA,L]
+</IfModule>
+
+# Enable CORS
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+</IfModule>
