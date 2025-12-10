@@ -13,12 +13,13 @@ import { getAuthUser, clearAuthUser, isAuthenticated } from './auth'
 function NavBar() {
   const [user, setUser] = useState(null)
   const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
-    // Vérifier si l'utilisateur est connecté au chargement
+    // Vérifier si l'utilisateur est connecté au chargement et à chaque changement de route
     const authUser = getAuthUser()
     setUser(authUser)
-  }, [])
+  }, [location])
 
   function handleLogout() {
     clearAuthUser()

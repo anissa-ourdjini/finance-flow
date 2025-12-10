@@ -1,8 +1,8 @@
 // API helper for frontend - Centralized
 const getApiBase = () => {
-  // In development, requests go through Vite proxy to /Backend
+  // In development, requests go through Vite proxy to /api
   // In production, they go directly to PHP backend
-  return '/Backend';
+  return '/api';
 };
 
 const apiUrl = (endpoint) => getApiBase() + '/' + endpoint;
@@ -56,15 +56,15 @@ async function getJson(endpoint, query = '') {
 
 // AUTH ROUTES
 export async function apiLogin(email, password) {
-  return postJson('login', { email, password });
+  return postJson('auth/login', { email, password });
 }
 
 export async function apiRegister(prenom, nom, email, password) {
-  return postJson('register', { prenom, nom, email, password });
+  return postJson('auth/register', { prenom, nom, email, password });
 }
 
 export async function apiLogout() {
-  return postJson('logout', {});
+  return postJson('auth/logout', {});
 }
 
 // TRANSACTIONS ROUTES
@@ -73,15 +73,15 @@ export async function apiGetTransactions() {
 }
 
 export async function apiAddTransaction(tx) {
-  return postJson('transactions/add', tx);
+  return postJson('transactions', tx);
 }
 
 export async function apiUpdateTransaction(tx) {
-  return putJson('transactions/update', tx);
+  return putJson('transactions/' + tx.id, tx);
 }
 
 export async function apiDeleteTransaction(id) {
-  return deleteJson('transactions/delete', { id });
+  return deleteJson('transactions/' + id, {});
 }
 
 // CATEGORIES ROUTES
@@ -95,15 +95,15 @@ export async function apiGetBudgets() {
 }
 
 export async function apiAddBudget(b) {
-  return postJson('budgets/add', b);
+  return postJson('budgets', b);
 }
 
 export async function apiUpdateBudget(b) {
-  return putJson('budgets/update', b);
+  return putJson('budgets/' + b.id, b);
 }
 
 export async function apiDeleteBudget(id) {
-  return deleteJson('budgets/delete', { id });
+  return deleteJson('budgets/' + id, {});
 }
 
 export default {

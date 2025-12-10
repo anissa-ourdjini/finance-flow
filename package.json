@@ -1,9 +1,0 @@
-{
-  "name": "finance-flow-root",
-  "private": true,
-  "scripts": {
-    "dev": "cd Frontend && npm run dev",
-    "build": "cd Frontend && npm run build",
-    "preview": "cd Frontend && npm run preview"
-  }
-}

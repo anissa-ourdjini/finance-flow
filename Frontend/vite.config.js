@@ -10,10 +10,10 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/Backend': {
+      '/api': {
         target: 'http://localhost:8000',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/Backend/, '/Backend')
+        rewrite: (path) => path.replace(/^\/api/, '/Backend')
       }
     }
   }
