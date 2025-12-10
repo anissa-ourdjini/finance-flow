@@ -30,10 +30,10 @@ function NavBar() {
   return (
     <nav className="top-nav">
       <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-        <Link to="/">Home</Link>
+        <Link to="/">Accueil</Link>
         {user && (
           <>
-            <Link to="/dashboard">Dashboard</Link>
+            <Link to="/dashboard">Tableau de bord</Link>
             <Link to="/transactions">Transactions</Link>
             <Link to="/budgets">Budgets</Link>
           </>
@@ -61,8 +61,8 @@ function NavBar() {
           </>
         ) : (
           <>
-            <Link to="/login">Login</Link>
-            <Link to="/register">Register</Link>
+            <Link to="/login">Connexion</Link>
+            <Link to="/register">Inscription</Link>
           </>
         )}
       </div>
