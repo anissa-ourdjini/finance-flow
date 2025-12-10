@@ -4,27 +4,20 @@ export default function Home() {
   const videoRef = useRef(null)
 
   useEffect(() => {
-    // Attendre que l'utilisateur interagisse avec la page pour autoriser le son
-    const enableSound = () => {
+    // Lancer la vidéo avec son dès que le composant charge
+    const playVideo = async () => {
       if (videoRef.current) {
-        videoRef.current.muted = false
-        videoRef.current.play().catch(err => {
-          console.log('Erreur lors du démarrage de la vidéo')
-        })
+        try {
+          // Essayer de jouer avec son
+          await videoRef.current.play()
+        } catch (error) {
+          console.log('Autoplay avec son refusé par le navigateur')
+        }
       }
-      // Retirer les listeners après la première interaction
-      document.removeEventListener('click', enableSound)
-      document.removeEventListener('touchstart', enableSound)
     }
 
-    // Ajouter les listeners pour la première interaction
-    document.addEventListener('click', enableSound)
-    document.addEventListener('touchstart', enableSound)
-
-    return () => {
-      document.removeEventListener('click', enableSound)
-      document.removeEventListener('touchstart', enableSound)
-    }
+    // Attendre un peu pour laisser le DOM se stabiliser
+    setTimeout(playVideo, 100)
   }, [])
 
   return (
