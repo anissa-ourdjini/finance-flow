@@ -1,13 +1,19 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <title>FinanceFlow</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Fallback error handler
+      window.addEventListener('error', (e) => {
+        console.error('Global error:', e.error);
+        document.body.innerHTML = '<h1>Erreur: ' + e.error?.message + '</h1><p>' + e.error?.stack + '</p>';
+      });
+    </script>
   </body>
 </html>

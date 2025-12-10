@@ -59,11 +59,8 @@ loadState();
 
 // try to load state from backend API (if available), otherwise fallback to local demo
 function tryLoadFromServer(){
-  // compute base path so requests work both in dev (vite) and when deployed under WAMP/Apache
-  const origin = window.location.origin;
-  const path = window.location.pathname.toLowerCase();
-  const BASE_APP = origin + ( path.includes('/financeflow') ? path.split('/').slice(0,2).join('/') + '/' : '/FinanceFlow/' );
-  const url = BASE_APP + 'Backend/get_transactions.php';
+  // Use direct backend URL for development
+  const url = 'http://127.0.0.1:8000/Backend/router.php/transactions';
   return fetch(url, { credentials: 'include' })
     .then(r => {
       if(!r.ok) throw new Error('no server data');

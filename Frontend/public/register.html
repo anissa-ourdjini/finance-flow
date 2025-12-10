@@ -43,58 +43,68 @@
 		</main>
 
 			<script>
-				// Registration using backend PHP (POST JSON)
-				// compute base path once so links work both in dev and when deployed
-				const _origin = window.location.origin;
-				const _path = window.location.pathname.toLowerCase();
-				const BASE_APP = _origin + ( _path.includes('/financeflow') ? _path.split('/').slice(0,2).join('/') + '/' : '/FinanceFlow/' );
-				function apiPath(endpoint){ return BASE_APP + 'Backend/' + endpoint; }
-				// set back link immediately
-				const backLinkInit = document.getElementById('backToDashboard');
-				if(backLinkInit) backLinkInit.href = BASE_APP + 'dashboard.html';
-				const form = document.getElementById('registerForm');
-				form.addEventListener('submit', async function(e){
+				// API helper - SHARED FUNCTION
+				window.getApiBase = function(){
+					const protocol = window.location.protocol;
+					const hostname = window.location.hostname;
+					const port = window.location.port;
+					
+					if(port === '5173') return protocol + '//' + hostname + ':8000';
+					if(!port || port === '80' || port === '443') return protocol + '//' + hostname;
+					return protocol + '//' + hostname + ':' + port;
+				};
+
+				window.apiCall = function(endpoint){
+					return getApiBase() + '/Backend/' + endpoint;
+				};
+
+				// Registration form
+				document.getElementById('registerForm').addEventListener('submit', async function(e){
 					e.preventDefault();
+					
 					const name = document.getElementById('name').value.trim();
 					const email = document.getElementById('email').value.trim().toLowerCase();
 					const password = document.getElementById('password').value;
 					const password2 = document.getElementById('password2').value;
 
 					if(!name || !email || !password){
-						alert('Veuillez remplir tous les champs.');
+						alert('Veuillez remplir tous les champs');
 						return;
 					}
 					if(password !== password2){
-						alert('Les mots de passe ne correspondent pas.');
+						alert('Les mots de passe ne correspondent pas');
 						return;
 					}
 
-					// split name into prenom / nom
+					// Split name
 					const parts = name.split(/\s+/);
 					const prenom = parts.shift();
-					const nom = parts.join(' ');
+					const nom = parts.join(' ') || '';
 
 					try{
-						const res = await fetch(apiPath('register.php'), {
+						const res = await fetch(apiCall('router.php/register'), {
 							method: 'POST',
 							headers: { 'Content-Type': 'application/json' },
-							body: JSON.stringify({ prenom, nom, email, password })
+							body: JSON.stringify({ prenom, nom, email, password }),
+							credentials: 'include'
 						});
-						const text = await res.text();
-						let data = null;
-						try{ data = JSON.parse(text); } catch(e){ console.error('Invalid JSON response for register:', text); alert('Réponse serveur invalide — voir console'); return; }
-						if(res.ok && data.ok){
-							alert('Inscription réussie — redirection vers le tableau de bord');
-							window.location.href = 'http://localhost/FinanceFlow/dashboard.html';
+						
+						const data = await res.json();
+						
+						if(data.ok){
+							alert('Inscription réussie ! Redirection vers le login...');
+							window.location.href = '../../index.html';
 						} else {
-							if(res.status === 409) alert('Cet email est déjà utilisé.');
-							else alert(data.error || data.message || 'Erreur lors de l\'inscription');
+							alert(data.message || 'Erreur lors de l\'inscription');
 						}
-					}catch(err){
-						console.error(err);
-						alert("Erreur réseau lors de l'inscription");
+					}catch(e){
+						console.error('Error:', e);
+						alert('Erreur réseau');
 					}
 				});
+
+				// Back link
+				document.getElementById('backToDashboard').href = 'dashboard.html';
 			</script>
 	</body>
 </html>

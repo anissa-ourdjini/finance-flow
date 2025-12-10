@@ -54,7 +54,7 @@
     async function loadAccount(){
       const infoEl = document.getElementById('accountInfo');
       try{
-        const res = await fetch('/Backend/login.php', { method: 'OPTIONS' });
+        const res = await fetch('http://127.0.0.1:8000/Backend/router.php/login', { method: 'OPTIONS', credentials: 'include' });
         // We don't actually call login; instead show a placeholder.
       }catch(e){}
       // Placeholder behavior: show session if any saved in sessionStorage

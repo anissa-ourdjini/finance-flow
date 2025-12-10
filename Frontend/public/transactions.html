@@ -3,16 +3,217 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Transactions — FinanceFlow</title>
+  <title>Mes Revenus — FinanceFlow</title>
   <link rel="stylesheet" href="./styles.css">
+  <style>
+    .tabs { display: flex; gap: 12px; margin-bottom: 16px; border-bottom: 2px solid #ddd; }
+    .tab { padding: 8px 16px; cursor: pointer; background: none; border: none; font-size: 16px; color: #666; }
+    .tab.active { color: #3788d8; font-weight: bold; border-bottom: 3px solid #3788d8; }
+    .revenue-item { padding: 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .revenue-info { flex: 1; }
+    .revenue-amount { font-weight: bold; font-size: 18px; color: #27ae60; margin-right: 12px; }
+    .btn-small { padding: 6px 12px; font-size: 12px; background: #3788d8; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 0 4px; }
+    .btn-small:hover { background: #2563a8; }
+    .btn-danger { background: #e74c3c; }
+    .btn-danger:hover { background: #c0392b; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+    .modal.active { display: flex; justify-content: center; align-items: center; }
+    .modal-content { background: white; padding: 24px; border-radius: 8px; width: 90%; max-width: 500px; }
+    .field { margin-bottom: 12px; }
+    .field label { display: block; margin-bottom: 4px; font-weight: bold; }
+    .field input, .field select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+    .modal-buttons { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+  </style>
 </head>
 <body>
   <main class="container">
     <section class="card">
-      <h2>Transactions</h2>
-      <p>Historique (placeholder).</p>
-      <a href="settings.html" class="btn">Retour</a>
+      <h2>Gestion des Revenus</h2>
+      
+      <button class="btn primary" id="addRevenueBtn" style="margin-bottom: 16px;">+ Ajouter un Revenu</button>
+      
+      <div id="revenueList" style="margin-bottom: 20px;">
+        <p style="text-align: center; color: #999;">Chargement...</p>
+      </div>
+      
+      <div style="padding: 12px; background: #f0f8ff; border-radius: 6px;">
+        <strong>Total des revenus:</strong> <span id="totalRevenue" style="font-size: 18px; color: #27ae60; font-weight: bold;">0€</span>
+      </div>
+      
+      <a href="dashboard.html" class="btn" style="margin-top: 16px;">Retour</a>
     </section>
   </main>
+
+  <!-- Modal -->
+  <div id="revenueModal" class="modal">
+    <div class="modal-content">
+      <h3 id="modalTitle">Ajouter un Revenu</h3>
+      <form id="revenueForm">
+        <div class="field">
+          <label>Date</label>
+          <input type="date" id="revDate" required>
+        </div>
+        <div class="field">
+          <label>Titre (Salaire, Prime, etc)</label>
+          <input type="text" id="revTitle" required>
+        </div>
+        <div class="field">
+          <label>Montant (€)</label>
+          <input type="number" id="revAmount" step="0.01" required>
+        </div>
+        <div class="field">
+          <label>Source (optionnel)</label>
+          <input type="text" id="revSource" placeholder="Ex: Employeur">
+        </div>
+        <div class="modal-buttons">
+          <button type="button" class="btn" onclick="closeModal()">Annuler</button>
+          <button type="submit" class="btn primary">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // API helper - SHARED FUNCTION
+    window.getApiBase = function(){
+      const protocol = window.location.protocol;
+      const hostname = window.location.hostname;
+      const port = window.location.port;
+      
+      if(port === '5173') return protocol + '//' + hostname + ':8000';
+      if(!port || port === '80' || port === '443') return protocol + '//' + hostname;
+      return protocol + '//' + hostname + ':' + port;
+    };
+
+    window.apiCall = function(endpoint){
+      return getApiBase() + '/Backend/' + endpoint;
+    };
+
+    let editingId = null;
+
+    // Load revenues
+    async function loadRevenues(){
+      try{
+        const res = await fetch(apiCall('get_transactions.php'), {
+          credentials: 'include'
+        });
+        const data = await res.json();
+        const revenues = (data.transactions || []).filter(t => t.type === 'revenu');
+        
+        const list = document.getElementById('revenueList');
+        if(revenues.length > 0){
+          const total = revenues.reduce((sum, r) => sum + r.montant, 0);
+          document.getElementById('totalRevenue').textContent = total.toFixed(2) + '€';
+          
+          list.innerHTML = revenues.map(r => `
+            <div class="revenue-item">
+              <div class="revenue-info">
+                <strong>${r.titre}</strong><br>
+                <small>${new Date(r.date_transaction).toLocaleDateString('fr-FR')} ${r.lieu ? '- ' + r.lieu : ''}</small>
+              </div>
+              <div class="revenue-amount">+${r.montant.toFixed(2)}€</div>
+              <button class="btn-small" onclick="editRevenue(${r.id}, '${r.titre}', ${r.montant}, '${r.date_transaction.split('T')[0]}', '${r.lieu || ''}')">Modifier</button>
+              <button class="btn-small btn-danger" onclick="deleteRevenue(${r.id})">Supprimer</button>
+            </div>
+          `).join('');
+        } else {
+          list.innerHTML = '<p style="text-align: center; color: #999;">Aucun revenu. Cliquez sur "+ Ajouter un Revenu".</p>';
+          document.getElementById('totalRevenue').textContent = '0€';
+        }
+      }catch(e){
+        console.error('Error:', e);
+        document.getElementById('revenueList').innerHTML = '<p style="text-align: center; color: #e74c3c;">Erreur de chargement</p>';
+      }
+    }
+
+    // Add button
+    document.getElementById('addRevenueBtn').addEventListener('click', () => {
+      editingId = null;
+      document.getElementById('modalTitle').textContent = 'Ajouter un Revenu';
+      document.getElementById('revenueForm').reset();
+      document.getElementById('revDate').valueAsDate = new Date();
+      document.getElementById('revenueModal').classList.add('active');
+    });
+
+    // Edit
+    window.editRevenue = function(id, title, amount, date, source){
+      editingId = id;
+      document.getElementById('modalTitle').textContent = 'Modifier le Revenu';
+      document.getElementById('revTitle').value = title;
+      document.getElementById('revAmount').value = amount;
+      document.getElementById('revDate').value = date;
+      document.getElementById('revSource').value = source;
+      document.getElementById('revenueModal').classList.add('active');
+    };
+
+    // Delete
+    window.deleteRevenue = async function(id){
+      if(!confirm('Supprimer ce revenu ?')) return;
+      try{
+        const res = await fetch(apiCall('delete_transaction.php'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id }),
+          credentials: 'include'
+        });
+        const data = await res.json();
+        if(data.ok) loadRevenues();
+        else alert('Erreur');
+      }catch(e){
+        console.error('Error:', e);
+      }
+    };
+
+    // Save
+    document.getElementById('revenueForm').addEventListener('submit', async function(e){
+      e.preventDefault();
+      
+      const title = document.getElementById('revTitle').value.trim();
+      const amount = parseFloat(document.getElementById('revAmount').value);
+      const date = document.getElementById('revDate').value;
+      const source = document.getElementById('revSource').value.trim();
+      
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      
+      const payload = {
+        titre: title,
+        montant: amount,
+        date_transaction: date,
+        type: 'revenu',
+        lieu: source,
+        utilisateur_id: user.id || null
+      };
+      
+      if(editingId) payload.id = editingId;
+      
+      try{
+        const endpoint = editingId ? 'update_transaction.php' : 'add_transaction.php';
+        const res = await fetch(apiCall(endpoint), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          credentials: 'include'
+        });
+        const data = await res.json();
+        if(data.ok){
+          closeModal();
+          loadRevenues();
+        } else {
+          alert('Erreur: ' + (data.message || 'Impossible de sauvegarder'));
+        }
+      }catch(e){
+        console.error('Error:', e);
+        alert('Erreur réseau');
+      }
+    });
+
+    function closeModal(){
+      document.getElementById('revenueModal').classList.remove('active');
+    }
+
+    // Initialize
+    document.getElementById('revDate').valueAsDate = new Date();
+    loadRevenues();
+  </script>
 </body>
 </html>
