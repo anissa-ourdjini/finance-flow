@@ -1,22 +1,26 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 
 export default function Home() {
   const videoRef = useRef(null)
+  const [needUnmute, setNeedUnmute] = useState(false)
 
   useEffect(() => {
-    // Lancer la vidéo avec son dès que le composant charge
+    // Tenter de lancer avec son immédiatement, sinon fallback muet
     const playVideo = async () => {
-      if (videoRef.current) {
-        try {
-          // Essayer de jouer avec son
-          await videoRef.current.play()
-        } catch (error) {
-          console.log('Autoplay avec son refusé par le navigateur')
-        }
+      if (!videoRef.current) return
+
+      videoRef.current.muted = false
+      try {
+        await videoRef.current.play()
+      } catch (err) {
+        console.log('Autoplay avec son refusé, on tente en muet')
+        setNeedUnmute(true)
+        videoRef.current.muted = true
+        videoRef.current.play().catch(e => console.log('Lecture échouée:', e))
       }
     }
 
-    // Attendre un peu pour laisser le DOM se stabiliser
+    // Petit délai pour laisser le DOM se stabiliser
     setTimeout(playVideo, 100)
   }, [])
 
@@ -35,20 +39,46 @@ export default function Home() {
         background: 'white',
         borderRadius: '16px',
         overflow: 'hidden',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.12)'
+        boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+        position: 'relative'
       }}>
         <video 
           ref={videoRef}
           controls
           autoPlay
           loop
-          muted={false}
           playsInline
           style={{ width: '100%', display: 'block' }}
         >
-          <source src="/assets/grok-video-63e76f90-1a00-4b3f-a9f0-8b876cf31417.mp4" type="video/mp4" />
+          <source src="/assets/grok-video-3e557791-bc9c-4a3a-8727-078196fc2ce5.mp4" type="video/mp4" />
           Votre navigateur ne supporte pas la lecture de vidéos.
         </video>
+
+        {needUnmute && (
+          <button
+            onClick={() => {
+              if (!videoRef.current) return
+              videoRef.current.muted = false
+              setNeedUnmute(false)
+              videoRef.current.play().catch(err => console.log('Lecture après unmute échouée:', err))
+            }}
+            style={{
+              position: 'absolute',
+              bottom: '16px',
+              right: '16px',
+              padding: '12px 16px',
+              background: '#0f172a',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '999px',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+              cursor: 'pointer',
+              fontWeight: 700
+            }}
+          >
+            Activer le son
+          </button>
+        )}
       </div>
     </div>
   )
