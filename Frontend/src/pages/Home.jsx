@@ -30,17 +30,49 @@ export default function Home() {
       flexDirection: 'column', 
       alignItems: 'center', 
       justifyContent: 'center',
-      minHeight: '80vh',
-      padding: '2rem' 
+      minHeight: '100vh',
+      padding: '1rem',
+      animation: 'fadeIn 0.6s ease-in'
     }}>
+      <style>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes pulse {
+          0%, 100% { box-shadow: 0 8px 32px rgba(216, 183, 232, 0.2); }
+          50% { box-shadow: 0 12px 48px rgba(216, 183, 232, 0.35); }
+        }
+        
+        @keyframes shimmer {
+          0% { opacity: 0.8; }
+          50% { opacity: 1; }
+          100% { opacity: 0.8; }
+        }
+      `}</style>
+
       <div style={{ 
         maxWidth: '900px', 
         width: '100%',
         background: 'white',
-        borderRadius: '16px',
+        borderRadius: '28px',
         overflow: 'hidden',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-        position: 'relative'
+        boxShadow: '0 8px 32px rgba(216, 183, 232, 0.25)',
+        position: 'relative',
+        border: '3px solid #E8D9F5',
+        animation: 'float 4s ease-in-out infinite, pulse 2s ease-in-out infinite'
       }}>
         <video 
           ref={videoRef}
@@ -66,17 +98,29 @@ export default function Home() {
               position: 'absolute',
               bottom: '16px',
               right: '16px',
-              padding: '12px 16px',
-              background: '#0f172a',
+              padding: '12px 20px',
+              background: 'linear-gradient(135deg, #D8B7E8, #C499E0)',
               color: '#fff',
               border: 'none',
-              borderRadius: '999px',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+              borderRadius: '20px',
+              boxShadow: '0 8px 24px rgba(216, 183, 232, 0.3)',
               cursor: 'pointer',
-              fontWeight: 700
+              fontWeight: 700,
+              fontSize: '16px',
+              transition: 'transform 0.2s, box-shadow 0.2s',
+              fontFamily: "'Comic Sans MS', cursive",
+              animation: 'shimmer 2s ease-in-out infinite'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'scale(1.1)'
+              e.target.style.boxShadow = '0 12px 32px rgba(216, 183, 232, 0.4)'
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'scale(1)'
+              e.target.style.boxShadow = '0 8px 24px rgba(216, 183, 232, 0.3)'
             }}
           >
-            Activer le son
+            🔊 Activer le son
           </button>
         )}
       </div>
