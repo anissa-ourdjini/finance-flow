@@ -13,7 +13,7 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '/FinanceFlow/Backend/router.php')
+        rewrite: (path) => path.replace(/^\/api/, '/FinanceFlow/api')
       }
     }
   }

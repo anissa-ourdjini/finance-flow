@@ -1,10 +1,12 @@
 <?php
-header('Content-Type: application/json');
+/**
+ * Endpoint de test simple
+ * http://localhost:8000/test.php
+ */
 
-// Test basique
 echo json_encode([
-    'ok' => true,
-    'php_version' => phpversion(),
-    'session_status' => session_status(),
-    'test' => 'Backend is working'
+    'status' => 'OK',
+    'message' => 'API FinanceFlow est en ligne',
+    'timestamp' => date('Y-m-d H:i:s')
 ]);
+?>

@@ -1,19 +1,16 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /
+    RewriteBase /FinanceFlow/
     
     # Allow access to actual files and directories
     RewriteCond %{REQUEST_FILENAME} -d [OR]
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^.*$ - [L]
     
-    # Route /Backend/* requests to Backend/router.php
-    RewriteRule ^Backend/(.*)$ Backend/router.php [QSA,L]
-    
-    # Route Frontend requests (Vite will handle)
+    # Route all requests through index.php, preserving the original path
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(?!Backend/).*$ index.html [QSA,L]
+    RewriteRule ^(.*)$ index.php?_route=$1 [QSA,L]
 </IfModule>
 
 # CORS headers for API

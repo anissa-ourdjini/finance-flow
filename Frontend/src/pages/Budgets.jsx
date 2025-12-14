@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { apiGetBudgets, apiAddBudget, apiGetCategories, apiGetTransactions } from '../api'
+import { apiGetBudgets, apiAddBudget, apiGetCategories, apiGetTransactions, apiDeleteBudget } from '../api'
 
 export default function Budgets(){
   const [budgets, setBudgets] = useState([])
@@ -81,6 +81,18 @@ export default function Budgets(){
       setError(null)
     } else {
       setError(res.data?.message || res.data?.error || 'Erreur lors de l\'ajout du budget')
+    }
+  }
+
+  async function handleDelete(budgetId) {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce budget ?')) return
+    
+    const res = await apiDeleteBudget(budgetId)
+    if (res.ok && res.data && res.data.ok) {
+      apiGetBudgets().then(r => setBudgets(r.data.budgets))
+      setError(null)
+    } else {
+      setError(res.data?.message || res.data?.error || 'Erreur lors de la suppression du budget')
     }
   }
 
@@ -300,30 +312,56 @@ export default function Budgets(){
                       </div>
                     </div>
                     
-                    {isOverBudget && (
-                      <span style={{
-                        padding: '0.25rem 0.75rem',
-                        background: '#ffebee',
-                        color: '#c62828',
-                        borderRadius: '20px',
-                        fontSize: '0.85rem',
-                        fontWeight: '600'
-                      }}>
-                        ⚠️ Dépassé
-                      </span>
-                    )}
-                    {isNearLimit && !isOverBudget && (
-                      <span style={{
-                        padding: '0.25rem 0.75rem',
-                        background: '#fff3e0',
-                        color: '#ef6c00',
-                        borderRadius: '20px',
-                        fontSize: '0.85rem',
-                        fontWeight: '600'
-                      }}>
-                        ⚡ Attention
-                      </span>
-                    )}
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                      {isOverBudget && (
+                        <span style={{
+                          padding: '0.25rem 0.75rem',
+                          background: '#ffebee',
+                          color: '#c62828',
+                          borderRadius: '20px',
+                          fontSize: '0.85rem',
+                          fontWeight: '600'
+                        }}>
+                          ⚠️ Dépassé
+                        </span>
+                      )}
+                      {isNearLimit && !isOverBudget && (
+                        <span style={{
+                          padding: '0.25rem 0.75rem',
+                          background: '#fff3e0',
+                          color: '#ef6c00',
+                          borderRadius: '20px',
+                          fontSize: '0.85rem',
+                          fontWeight: '600'
+                        }}>
+                          ⚡ Attention
+                        </span>
+                      )}
+                      <button
+                        onClick={() => handleDelete(b.id)}
+                        style={{
+                          padding: '0.5rem 1rem',
+                          background: '#f5f5f5',
+                          color: '#d32f2f',
+                          border: '1px solid #ef5350',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontSize: '0.85rem',
+                          fontWeight: '600',
+                          transition: 'all 0.2s ease'
+                        }}
+                        onMouseOver={(e) => {
+                          e.target.style.background = '#ffebee'
+                          e.target.style.borderColor = '#c62828'
+                        }}
+                        onMouseOut={(e) => {
+                          e.target.style.background = '#f5f5f5'
+                          e.target.style.borderColor = '#ef5350'
+                        }}
+                      >
+                        🗑️ Supprimer
+                      </button>
+                    </div>
                   </div>
 
                   {/* Barre de progression */}
